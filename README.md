@@ -47,6 +47,7 @@ DIGIT = ( ccoó | cocó | cooó | coccó | cocoó | coooó | cocccó | coccoó |
 
 
 ##### Ex:
+```
 Ta na hora do Cocoricó ta na hora da turma do [Julio]
     Cocori Julio
     Cantando Cocori Julio + ccoó rural
@@ -65,3 +66,4 @@ cocó
 coccó
 coooó
 coccoó
+```
