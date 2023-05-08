@@ -20,6 +20,7 @@ class CoffeeParser:
                 "EQT",
                 "AND",
                 "OR",
+                "COMMA",
                 "SEMICOLON",
                 "LPAREN",
                 "RPAREN",
@@ -62,12 +63,37 @@ class CoffeeParser:
         @self.pg.production("statement : loop")
         @self.pg.production("statement : variable_declaration")
         @self.pg.production("statement : assignment")
+        @self.pg.production("statement : func_dec")
         def statement(p):
             return p[0]
 
         @self.pg.production("serve_statement : PRINT rel_expression SEMICOLON")
         def serve_statement(p):
             return Print([p[1]])
+
+        ## Function
+        @self.pg.production(
+            "func_dec : FUNC_DEC IDENTIFIER LPAREN param_list RPAREN LBRACE statements RBRACE"
+        )
+        def func_dec(p):
+            VarDec(p[1].value).evaluate()
+            Assignment(p[1].value, Function(p[3], p[6]), func=True).evaluate()
+            return NoOp()
+
+        @self.pg.production("param_list : ")
+        @self.pg.production("param_list : IDENTIFIER")
+        @self.pg.production("param_list : param_list COMMA IDENTIFIER")
+        def param_list(p):
+            if len(p) == 0:
+                return [NoOp()]
+            if len(p) == 1:
+                return [p[0]]
+            p[0].append(p[2])
+            return p[0]
+
+        @self.pg.production("factor : IDENTIFIER LPAREN RPAREN")
+        def factor_number(p):
+            return Identifier(p[0].value).evaluate()
 
         ## Conditional
         @self.pg.production(

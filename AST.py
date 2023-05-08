@@ -102,6 +102,9 @@ class Assignment(Node):
         self.func = func
 
     def evaluate(self):
+        if self.func:
+            SymbolTable.setter(self.value, self.children)
+            return
         SymbolTable.setter(self.value, self.children[0].evaluate())
 
 
@@ -132,3 +135,16 @@ class If(Node):
             return self.children[1].evaluate()
         if len(self.children) == 3:
             return self.children[2].evaluate()
+
+
+class Function(Node):
+    def __init__(self, parameters, children) -> None:
+        super().__init__(0, children)
+        # self.parameters = parameters
+
+    def evaluate(self) -> None:
+        local_symbols = SymbolTable()
+        # for tkn in self.parameters:
+        #     local_symbols.create(tkn.value)
+        for child in self.children:
+            child.evaluate()
