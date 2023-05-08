@@ -28,30 +28,18 @@ digit = "0" | "1" | ... | "9" ;
 #### example
 ```
 Let's brew a coffee
-
-cup coffeeBeans = 10;
-cup water = 200;
-
-percolate (coffeeBeans) {
-  coffeeBeans = coffeeBeans - 1;
-  water = water + 20;
-  sip (i / 2 == 0) {
-    addSugar(2);
-  } gulp {
-    addMilk(1);
+  cup blackCoffee = 10;
+  cup americanCoffee = 0;
+  cup water = 1;
+  percolate(blackCoffee stronger than americanCoffee) {
+    sip (blackCoffee weaker than 5) {
+      sip(blackCoffee weaker than 2) {
+        serve "No sugar added";
+      } gulp {
+        serve "Adding sugar";
+      }
+    }
+    blackCoffee = blackCoffee - water;
   }
-}
-
-brew addSugar (amount) {
-  cup sugar = amount;
-  pour sugar;
-}
-
-brew addMilk (amount) {
-  cup milk = amount;
-  pour milk;
-}
-
 Your coffee is ready
-
 ```

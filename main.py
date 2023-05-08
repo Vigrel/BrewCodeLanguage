@@ -4,14 +4,18 @@ from CoffeeParser import CoffeeParser
 
 text_input = """
 Let's brew a coffee
-  cup small;
-  cup big;
-  small = 0;
-  big = 5;
-  sip (small){
-      serve  small;
-  } gulp{
-      serve  big;
+  cup blackCoffee = 10;
+  cup americanCoffee = 0;
+  cup water = 1;
+  percolate(blackCoffee stronger than americanCoffee) {
+    sip (blackCoffee weaker than 5) {
+      sip(blackCoffee weaker than 2) {
+        serve "No sugar added";
+      } gulp {
+        serve "Adding sugar";
+      }
+    }
+    blackCoffee = blackCoffee - water;
   }
 Your coffee is ready
 """
