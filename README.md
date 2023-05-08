@@ -1,69 +1,78 @@
-# EBNF
+### EBNF
 
-#### body
-BLOCK = (STATEMENT, { STATEMENT }), "Cocoricooó";
+program = "Let's brew a coffee", { block }, "Your coffee is ready" ; 
 
-STATEMENT = ( λ, "\n") | ASSIGNMENT | PRINT | WHILE | DEF_FUNC;
+block = { statement } ;
 
-ASSIGNMENT = "Pata de ", IDENTIFIER, "Dança de ", EXPRESSION ;
+statement = function_declaration | variable_declaration | expression | assignment | loop | condition | return_statement | serve_statement ;
 
-EXPRESSION = TERM, { ("+" | "-"), TERM } ;
+function_declaration = "brew" , function_name , parameter_list , function_body ;
 
-TERM = (FACTOR, { ("*" | "/"), FACTOR }) | STRING ;
+function_name = identifier ;
 
-FACTOR = (("+" | "-"), FACTOR) | NUMBER | "(", EXPRESSION, ")" | IDENTIFIER ;
+parameter_list = "(" , [ identifier , { "," , identifier } ] , ")" ;
 
-IDENTIFIER = LETTER, { LETTER | DIGIT | "_" } ;
+function_body = "{" , block , "}" ;
 
+variable_declaration = "cup" , variable_name, ["=",expression] ";" ;
 
-#### print
-PRINT = "Cocori ", EXPRESSION ;
+variable_name = identifier ;
 
-#### func
-DEF_FUNC = "Ta na hora do ", IDENTIFIER, "Ta na hora da turma do [", (IDENTIFIER, {",", IDENTIFIER}), "], OPS_FUNC ;
+expression = term , { ( "+" | "-" ) , term } ;
 
-OPS_FUNC = STATEMENT, { STATEMENT },  "Cantando ", EXPRESSION, "rural" ;
+term = factor , { ( "*" | "/" ) , factor } ;
 
-CALL_FUNC = IDENTIFIER, "na gaita e  [", (IDENTIFIER, {",", IDENTIFIER}), "] no co-co-coral" ;
+factor = number | variable | function_call | "(" , expression , ")" ;
 
+number = digit , { digit } ;
 
-#### loop
-WHILE = "Olha o có-có-có-có começando", CONDITIONAL, STATEMENT, { STATEMENT } "Cocoricó" ;
+variable = variable_name ;
 
-CONDITIONAL = COMPARE, {("e" | "ou"), COMPARE}, "chacoalhando!" ;
+function_call = function_name , "()" ;
 
-COMPARE = EXPRESSION, { (">" | ">=" | "==" | "!=" | "<=" | "<"), EXPRESSION };
+assignment = variable_name , "=" , expression , ";" ;
 
-##### chars/types
-STRING = "'", {ALL CHARACTERS} ,"'";
+loop = "percolate" , "(" , expression , ")" , "{" , block , "}" ;
 
-ALL CHARACTERS = ? all visible characters ? ;
+condition = "sip" , "(" , expression , ")" , "{" , block , "}" , [ "gulp" , "{" , block , "}" ] ;
 
-NUMBER = DIGIT, { DIGIT } ;
+return_statement = "pour" , expression , ";" ;
 
-LETTER = ( a | ... | z | A | ... | Z ) ;
+serve_statement = "serve" , expression , ";" ;
 
-DIGIT = ( ccoó | cocó | cooó | coccó | cocoó | coooó | cocccó | coccoó | ccooó | có ) ;
+identifier = letter , { letter | digit | "_" } ;
 
+letter = "a" | "b" | ... | "z" | "A" | "B" | ... | "Z" ;
 
-##### Ex:
+digit = "0" | "1" | ... | "9" ;
+
+#### example
 ```
-Ta na hora do Cocoricó ta na hora da turma do [Julio]
-    Cocori Julio
-    Cantando Cocori Julio + ccoó rural
+Let's brew a coffee
 
-Pata de Galinha Dança de cocó
+cup coffeeBeans = 10;
+cup water = 200;
 
-Olha o có-có-có-có começando Galinha < ccooó chacoalhando!
-    Cocoricó na gaita e Galha no co-co-coral
-    Pata de Galinha Dança de cocó + cocó
-    Cocoricó
+percolate (coffeeBeans) {
+  coffeeBeans = coffeeBeans - 1;
+  water = water + 20;
+  sip (i / 2 == 0) {
+    addSugar(2);
+  } gulp {
+    addMilk(1);
+  }
+}
 
-Cocoricooó
+brew addSugar (amount) {
+  cup sugar = amount;
+  pour sugar;
+}
 
-output:
-cocó
-coccó
-coooó
-coccoó
+brew addMilk (amount) {
+  cup milk = amount;
+  pour milk;
+}
+
+Your coffee is ready
+
 ```
