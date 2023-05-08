@@ -15,6 +15,11 @@ class CoffeeParser:
                 "ELSE",
                 "PRINT",
                 "RETURN",
+                "GT",
+                "LT",
+                "EQT",
+                "AND",
+                "OR",
                 "SEMICOLON",
                 "LPAREN",
                 "RPAREN",
@@ -51,7 +56,7 @@ class CoffeeParser:
             p[0].append(p[1])
             return p[0]
 
-        @self.pg.production("statement : expression SEMICOLON")
+        @self.pg.production("statement : rel_expression SEMICOLON")
         @self.pg.production("statement : serve_statement")
         @self.pg.production("statement : condition")
         @self.pg.production("statement : loop")
@@ -60,16 +65,16 @@ class CoffeeParser:
         def statement(p):
             return p[0]
 
-        @self.pg.production("serve_statement : PRINT expression SEMICOLON")
+        @self.pg.production("serve_statement : PRINT rel_expression SEMICOLON")
         def serve_statement(p):
             return Print([p[1]])
 
         ## Conditional
         @self.pg.production(
-            "condition : IF LPAREN expression RPAREN LBRACE statements RBRACE ELSE LBRACE statements RBRACE"
+            "condition : IF LPAREN rel_expression RPAREN LBRACE statements RBRACE ELSE LBRACE statements RBRACE"
         )
         @self.pg.production(
-            "condition : IF LPAREN expression RPAREN LBRACE statements RBRACE"
+            "condition : IF LPAREN rel_expression RPAREN LBRACE statements RBRACE"
         )
         def condition_statement(p):
             if len(p) > 7:
@@ -77,7 +82,7 @@ class CoffeeParser:
             return If([p[2], Block(p[5])])
 
         @self.pg.production(
-            "loop : LOOP LPAREN expression RPAREN LBRACE statements RBRACE"
+            "loop : LOOP LPAREN rel_expression RPAREN LBRACE statements RBRACE"
         )
         def loop_statement(p):
             return While([p[2], Block(p[5])])
@@ -85,7 +90,7 @@ class CoffeeParser:
         ## Variables
         @self.pg.production("variable_declaration : VARIABLE_DEC IDENTIFIER SEMICOLON")
         @self.pg.production(
-            "variable_declaration : VARIABLE_DEC IDENTIFIER EQUALS expression SEMICOLON"
+            "variable_declaration : VARIABLE_DEC IDENTIFIER EQUALS rel_expression SEMICOLON"
         )
         def variable_declaration(p):
             if len(p) > 3:
@@ -93,14 +98,24 @@ class CoffeeParser:
                 return Assignment(p[1].value, [p[3]])
             return VarDec(p[1].value)
 
-        @self.pg.production("assignment : IDENTIFIER EQUALS expression SEMICOLON")
+        @self.pg.production("assignment : IDENTIFIER EQUALS rel_expression SEMICOLON")
         def assignment(p):
             return Assignment(p[0].value, [p[2]])
 
         ## Body
+        @self.pg.production("rel_expression : expression")
+        @self.pg.production("rel_expression : rel_expression EQT expression")
+        @self.pg.production("rel_expression : rel_expression GT expression")
+        @self.pg.production("rel_expression : rel_expression LT expression")
+        def rel_expression(p):
+            if len(p) == 1:
+                return p[0]
+            return BinOp(p[1].gettokentype(), [p[0], p[2]])
+
         @self.pg.production("expression : term")
         @self.pg.production("expression : expression PLUS term")
         @self.pg.production("expression : expression MINUS term")
+        @self.pg.production("expression : expression OR term")
         def expression(p):
             if len(p) == 1:
                 return p[0]
@@ -109,6 +124,7 @@ class CoffeeParser:
         @self.pg.production("term : factor")
         @self.pg.production("term : term TIMES factor")
         @self.pg.production("term : term DIVIDE factor")
+        @self.pg.production("term : term AND factor")
         def term(p):
             if len(p) == 1:
                 return p[0]
@@ -126,8 +142,8 @@ class CoffeeParser:
         def factor_identifier(p):
             return Identifier(p[0].value)
 
-        @self.pg.production("factor : LPAREN expression RPAREN")
-        def factor_expression(p):
+        @self.pg.production("factor : LPAREN rel_expression RPAREN")
+        def factor_rel_expression(p):
             return p[1]
 
     def get_parser(self):

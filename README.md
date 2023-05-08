@@ -1,51 +1,28 @@
 ### EBNF
-
 program = "Let's brew a coffee", { block }, "Your coffee is ready" ; 
-
 block = { statement } ;
-
-statement = function_declaration | variable_declaration | expression | assignment | loop | condition | return_statement | serve_statement ;
-
+statement = function_declaration | variable_declaration | rel_expression | assignment | loop | condition | return_statement | serve_statement ;
 function_declaration = "brew" , function_name , parameter_list , function_body ;
-
 function_name = identifier ;
-
 parameter_list = "(" , [ identifier , { "," , identifier } ] , ")" ;
-
 function_body = "{" , block , "}" ;
-
-variable_declaration = "cup" , variable_name, ["=",expression] ";" ;
-
+variable_declaration = "cup" , variable_name, ["=",rel_expression] ";" ;
 variable_name = identifier ;
-
-expression = term , { ( "+" | "-" ) , term } ;
-
-term = factor , { ( "*" | "/" ) , factor } ;
-
-factor = string | number | variable | function_call | "(" , expression , ")" ;
-
+rel_expression = expression , { ( "==" | ">" | "<" ) , expression } ;
+expression = term , { ( "+" | "-" | "||" ) , term } ;
+term = factor , { ( "*" | "/" | "&&" ) , factor } ;
+factor = string | number | variable | function_call | "(" , rel_expression , ")" ;
 string = '"', ? any possible characte?, '"' ;
-
 number = digit , { digit } ;
-
 variable = variable_name ;
-
 function_call = function_name , "()" ;
-
-assignment = variable_name , "=" , expression , ";" ;
-
-loop = "percolate" , "(" , expression , ")" , "{" , block , "}" ;
-
-condition = "sip" , "(" , expression , ")" , "{" , block , "}" , [ "gulp" , "{" , block , "}" ] ;
-
-return_statement = "pour" , expression , ";" ;
-
-serve_statement = "serve" , expression , ";" ;
-
+assignment = variable_name , "=" , rel_expression , ";" ;
+loop = "percolate" , "(" , rel_expression , ")" , "{" , block , "}" ;
+condition = "sip" , "(" , rel_expression , ")" , "{" , block , "}" , [ "gulp" , "{" , block , "}" ] ;
+return_statement = "pour" , rel_expression , ";" ;
+serve_statement = "serve" , rel_expression , ";" ;
 identifier = letter , { letter | digit | "_" } ;
-
 letter = "a" | "b" | ... | "z" | "A" | "B" | ... | "Z" ;
-
 digit = "0" | "1" | ... | "9" ;
 
 #### example

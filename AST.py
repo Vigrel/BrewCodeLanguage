@@ -26,6 +26,16 @@ class BinOp(Node):
             return self.children[0].evaluate() * self.children[1].evaluate()
         if self.value == "DIVIDED":
             return self.children[0].evaluate() // self.children[1].evaluate()
+        if self.value == "LT":
+            return self.children[0].evaluate() < self.children[1].evaluate()
+        if self.value == "GT":
+            return self.children[0].evaluate() > self.children[1].evaluate()
+        if self.value == "AND":
+            return self.children[0].evaluate() and self.children[1].evaluate()
+        if self.value == "OR":
+            return self.children[0].evaluate() or self.children[1].evaluate()
+        if self.value == "EQT":
+            return self.children[0].evaluate() == self.children[1].evaluate()
 
 
 class UnOp(Node):
