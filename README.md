@@ -22,7 +22,9 @@ expression = term , { ( "+" | "-" ) , term } ;
 
 term = factor , { ( "*" | "/" ) , factor } ;
 
-factor = number | variable | function_call | "(" , expression , ")" ;
+factor = string | number | variable | function_call | "(" , expression , ")" ;
+
+string = '"', ? any possible characte?, '"' ;
 
 number = digit , { digit } ;
 

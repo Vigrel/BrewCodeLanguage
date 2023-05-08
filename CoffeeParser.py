@@ -6,8 +6,6 @@ class CoffeeParser:
     def __init__(self):
         self.pg = ParserGenerator(
             [
-                "NUMBER",
-                "IDENTIFIER",
                 "SOF",
                 "EOF",
                 "FUNC_DEC",
@@ -27,6 +25,9 @@ class CoffeeParser:
                 "MINUS",
                 "TIMES",
                 "DIVIDE",
+                "IDENTIFIER",
+                "STRING",
+                "NUMBER",
             ],
             precedence=[
                 ("left", ["PLUS", "MINUS"]),
@@ -83,7 +84,13 @@ class CoffeeParser:
 
         ## Variables
         @self.pg.production("variable_declaration : VARIABLE_DEC IDENTIFIER SEMICOLON")
+        @self.pg.production(
+            "variable_declaration : VARIABLE_DEC IDENTIFIER EQUALS expression SEMICOLON"
+        )
         def variable_declaration(p):
+            if len(p) > 3:
+                VarDec(p[1].value).evaluate()
+                return Assignment(p[1].value, [p[3]])
             return VarDec(p[1].value)
 
         @self.pg.production("assignment : IDENTIFIER EQUALS expression SEMICOLON")
@@ -110,6 +117,10 @@ class CoffeeParser:
         @self.pg.production("factor : NUMBER")
         def factor_number(p):
             return IntVal(p[0].value)
+
+        @self.pg.production("factor : STRING")
+        def factor_number(p):
+            return StrVal(p[0].value[1:-1])
 
         @self.pg.production("factor : IDENTIFIER")
         def factor_identifier(p):
