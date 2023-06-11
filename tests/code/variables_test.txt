@@ -1,0 +1,11 @@
+Lets brew a coffee
+
+lungo coffee;
+coffee = "Arabica";
+serve "Your coffee option is " + coffee;
+
+cup water;
+water = 270;
+serve "Here is your cup of water (" + water + " ml)";
+
+Your coffee is ready

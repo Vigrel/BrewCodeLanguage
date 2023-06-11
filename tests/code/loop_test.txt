@@ -1,0 +1,11 @@
+Lets brew a coffee
+
+cup macchiato;
+macchiato = 0;
+
+percolate macchiato weaker 5 {
+  serve "Brewing cup number: " + macchiato + ".";
+  macchiato = macchiato + 1;
+}
+
+Your coffee is ready

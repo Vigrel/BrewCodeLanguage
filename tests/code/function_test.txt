@@ -1,0 +1,28 @@
+Lets brew a coffee
+
+brew cup calculateBrewingTime(lungo coffeeType, cup desiredStrength) {
+  cup baseBrewingTime;
+
+  sip coffeeType same "espresso" {
+    baseBrewingTime = 20;
+  } 
+  sip coffeeType same "drip" {
+    baseBrewingTime = 120;
+  } gulp {
+    baseBrewingTime = 180;
+  }
+
+  cup time;
+  time = baseBrewingTime + (desiredStrength - 5) * 10;
+
+  pour time;
+}
+
+lungo coffeeType;
+coffeeType = "drip";
+cup strength;
+strength = 7;
+
+serve "The brewing time for a " + coffeeType + " coffee with strength " + strength + " is approximately " + calculateBrewingTime(coffeeType, strength) + " seconds.";
+
+Your coffee is ready

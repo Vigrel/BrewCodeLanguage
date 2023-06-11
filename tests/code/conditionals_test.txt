@@ -1,0 +1,21 @@
+Lets brew a coffee
+
+cup coffeeStrength;
+coffeeStrength = 5;
+
+cup desiredStrength;
+desiredStrength = 8;
+
+cup expresso;
+expresso = 5;
+
+sip coffeeStrength weaker desiredStrength {
+  serve "Adding an extra shot to make it stronger!";
+  coffeeStrength = coffeeStrength + expresso;
+} gulp {
+  serve "The coffee is at the desired strength. Enjoy your cup!";
+}
+
+serve "Your coffee strength is: " + coffeeStrength + ".";
+
+Your coffee is ready
