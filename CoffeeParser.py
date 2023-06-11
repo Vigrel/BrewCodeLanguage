@@ -1,15 +1,18 @@
 from rply import ParserGenerator
-from AST import *
+from compiler.Node import *
+from compiler.SymbolTable import SymbolTable
 
 
 class CoffeeParser:
     def __init__(self):
+        self.st = SymbolTable()
         self.pg = ParserGenerator(
             [
                 "SOF",
                 "EOF",
                 "FUNC_DEC",
-                "VARIABLE_DEC",
+                "INT",
+                "STR",
                 "LOOP",
                 "IF",
                 "ELSE",
@@ -57,78 +60,88 @@ class CoffeeParser:
             p[0].append(p[1])
             return p[0]
 
-        @self.pg.production("statement : rel_expression SEMICOLON")
-        @self.pg.production("statement : serve_statement")
         @self.pg.production("statement : condition")
         @self.pg.production("statement : loop")
-        @self.pg.production("statement : variable_declaration")
-        @self.pg.production("statement : assignment")
-        @self.pg.production("statement : func_dec")
+        @self.pg.production("statement : function_declaration")
+        @self.pg.production("statement : rel_expression SEMICOLON")
+        @self.pg.production("statement : print_statement SEMICOLON")
+        @self.pg.production("statement : variable_declaration SEMICOLON")
+        @self.pg.production("statement : variable_assignment SEMICOLON")
+        @self.pg.production("statement : return_statement SEMICOLON")
         def statement(p):
             return p[0]
 
-        @self.pg.production("serve_statement : PRINT rel_expression SEMICOLON")
-        def serve_statement(p):
-            return Print([p[1]])
-
-        ## Function
+        ##########  FUNCTIONS
         @self.pg.production(
-            "func_dec : FUNC_DEC IDENTIFIER LPAREN param_list RPAREN LBRACE statements RBRACE"
+            "function_declaration : FUNC_DEC INT IDENTIFIER LPAREN param_list RPAREN LBRACE statements RBRACE"
         )
-        def func_dec(p):
-            VarDec(p[1].value).evaluate()
-            Assignment(p[1].value, Function(p[3], p[6]), func=True).evaluate()
-            return NoOp()
+        @self.pg.production(
+            "function_declaration : FUNC_DEC STR IDENTIFIER LPAREN param_list RPAREN LBRACE statements RBRACE"
+        )
+        def function_declaration(p):
+            return FuncDec(p[1].name, [p[2].value, p[4], Block(p[7])])
 
         @self.pg.production("param_list : ")
-        @self.pg.production("param_list : IDENTIFIER")
-        @self.pg.production("param_list : param_list COMMA IDENTIFIER")
+        @self.pg.production("param_list : variable_declaration")
+        @self.pg.production("param_list : param_list COMMA variable_declaration")
         def param_list(p):
             if len(p) == 0:
-                return [NoOp()]
+                return []
+            if len(p) == 1:
+                return [[p[0].value, p[0].children]]
+            p[0].append([p[2].value, p[2].children])
+            return p[0]
+
+        @self.pg.production("function_call : IDENTIFIER LPAREN  param_list_call RPAREN")
+        def function_call(p):
+            return FuncCall(p[0].value, p[2])
+
+        @self.pg.production("param_list_call : ")
+        @self.pg.production("param_list_call : rel_expression")
+        @self.pg.production("param_list_call : param_list_call COMMA rel_expression")
+        def param_list_call(p):
+            if len(p) == 0:
+                return []
             if len(p) == 1:
                 return [p[0]]
             p[0].append(p[2])
             return p[0]
 
-        @self.pg.production("factor : IDENTIFIER LPAREN RPAREN")
-        def factor_number(p):
-            return Identifier(p[0].value).evaluate()
+        @self.pg.production("return_statement : RETURN rel_expression")
+        def return_statement(p):
+            return Return([p[1]])
 
-        ## Conditional
+        ##########  CONDITIONAL
         @self.pg.production(
-            "condition : IF LPAREN rel_expression RPAREN LBRACE statements RBRACE ELSE LBRACE statements RBRACE"
+            "condition : IF rel_expression LBRACE statements RBRACE ELSE LBRACE statements RBRACE"
         )
-        @self.pg.production(
-            "condition : IF LPAREN rel_expression RPAREN LBRACE statements RBRACE"
-        )
+        @self.pg.production("condition : IF rel_expression LBRACE statements RBRACE")
         def condition_statement(p):
-            if len(p) > 7:
-                return If([p[2], Block(p[5]), Block(p[9])])
-            return If([p[2], Block(p[5])])
+            if len(p) > 5:
+                return If([p[1], Block(p[3]), Block(p[7])])
+            return If([p[1], Block(p[3])])
 
-        @self.pg.production(
-            "loop : LOOP LPAREN rel_expression RPAREN LBRACE statements RBRACE"
-        )
+        ##########  LOOP_STATEM
+        @self.pg.production("loop : LOOP rel_expression LBRACE statements RBRACE")
         def loop_statement(p):
-            return While([p[2], Block(p[5])])
+            return While([p[1], Block(p[3])])
 
-        ## Variables
-        @self.pg.production("variable_declaration : VARIABLE_DEC IDENTIFIER SEMICOLON")
-        @self.pg.production(
-            "variable_declaration : VARIABLE_DEC IDENTIFIER EQUALS rel_expression SEMICOLON"
-        )
+        ##########  VARIABLES
+        @self.pg.production("variable_declaration : INT IDENTIFIER")
+        @self.pg.production("variable_declaration : STR IDENTIFIER")
         def variable_declaration(p):
-            if len(p) > 3:
-                VarDec(p[1].value).evaluate()
-                return Assignment(p[1].value, [p[3]])
-            return VarDec(p[1].value)
+            return VarDec(p[1].value, p[0].name)
 
-        @self.pg.production("assignment : IDENTIFIER EQUALS rel_expression SEMICOLON")
-        def assignment(p):
+        @self.pg.production("variable_assignment : IDENTIFIER EQUALS rel_expression")
+        def variable_assignment(p):
             return Assignment(p[0].value, [p[2]])
 
-        ## Body
+        ##########  PRINT_STATEM
+        @self.pg.production("print_statement : PRINT rel_expression")
+        def print_statement(p):
+            return Print([p[1]])
+
+        ##########  EXPRESSSIONS
         @self.pg.production("rel_expression : expression")
         @self.pg.production("rel_expression : rel_expression EQT expression")
         @self.pg.production("rel_expression : rel_expression GT expression")
@@ -171,6 +184,10 @@ class CoffeeParser:
         @self.pg.production("factor : LPAREN rel_expression RPAREN")
         def factor_rel_expression(p):
             return p[1]
+
+        @self.pg.production("factor : function_call")
+        def factor_rel_expression(p):
+            return p[0]
 
     def get_parser(self):
         return self.pg.build()

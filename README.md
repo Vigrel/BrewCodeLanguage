@@ -48,7 +48,7 @@ loop = "percolate" , rel_expression , "{" , block , "}" ;
 
 ## If/else
 ---
-condition = "sip" , "(" , rel_expression , ")" , "{" , block , "}" , [ "gulp" , "{" , block , "}" ] ;
+condition = "sip" , rel_expression , "{" , block , "}" , [ "gulp" , "{" , block , "}" ] ;
 
 ## Others
 ---
