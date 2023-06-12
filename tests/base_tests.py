@@ -12,7 +12,7 @@ sys.path.append(parent_dir)
 
 import pytest
 
-from compiler import CoffeeLexer, Parser, RplyParser, Tokenizer
+from compiler import CoffeeLexer, Parser, RplyParser, Tokenizer, FuncTable
 
 DIRECTORY = "./tests/code/"
 
@@ -62,6 +62,7 @@ def test_own_lexical(files):
 
 
 def test_own_parser(files):
+    FuncTable.functions = {}
     for file in files:
         try:
             Parser.run(open(file, "r").read())
