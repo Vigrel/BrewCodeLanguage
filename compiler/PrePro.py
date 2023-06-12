@@ -1,24 +1,33 @@
-import re
-
 OPS = {
     "+": "PLUS",
     "-": "MINUS",
-    "*": "MULT",
-    "/": "DIV",
+    "*": "TIMES",
+    "/": "DIVIDED",
     "(": "PARENO",
     ")": "PARENC",
     "!": "NOT",
-    ">": "GT",
-    "<": "LT",
-    ".": "CONC",
     ",": "COMMA",
+    "=": "EQUALS",
+    ";": "SEMICOLON",
+    "{": "LBRACE",
+    "}": "RBRACE",
+    "\n": "LN",
 }
-
-
-class PrePro:
-    @staticmethod
-    def filter(code: str) -> str:
-        return re.sub(r"\s*#.*$", "", code, flags=re.MULTILINE)
+RES_WRDS = {
+    "brew": "FUNC_DEC",
+    "cup": "INT",
+    "lungo": "STR",
+    "percolate": "LOOP",
+    "sip": "IF",
+    "gulp": "ELSE",
+    "serve": "PRINT",
+    "pour": "RETURN",
+    "stronger": "GT",
+    "weaker": "LT",
+    "same": "EQT",
+    "also": "AND",
+    "maybe": "OR",
+}
 
 
 class Token:
@@ -29,7 +38,7 @@ class Token:
 
 class Tokenizer:
     def __init__(self, source: str) -> None:
-        self.source: str = PrePro.filter(source)
+        self.source: str = source
         self.position: int = 0
         self.next: Token = Token("", 0)
         self.length = len(self.source)
@@ -47,42 +56,13 @@ class Tokenizer:
             elif letter in OPS:
                 self.next = Token(OPS[letter], letter)
 
-            elif letter in ["|", "&", "=", ":"]:
-                symbol = letter
-                while self.position < self.length and self.source[self.position] in [
-                    "|",
-                    "&",
-                    "=",
-                    ":",
-                    " ",
-                ]:
-                    if self.source[self.position] == symbol:
-                        if symbol == "&":
-                            self.next = Token("AND", f"&&")
-                        if symbol == "|":
-                            self.next = Token("OR", f"||")
-                        if symbol == ":":
-                            self.next = Token("TYPE", f"::")
-                        if symbol == "=":
-                            self.next = Token("EQUALSS", f"==")
-                        self.position += 1
-                        break
-                    self.position += 1
-                else:
-                    if symbol == "=":
-                        self.next = Token("EQUALS", f"=")
-                    else:
-                        raise SyntaxError(
-                            f"invalid syntax - {self.source[self.position - 1]}"
-                        )
-
             elif letter == '"':
                 string = ""
                 while self.source[self.position] != '"':
                     string += self.source[self.position]
                     self.position += 1
                 self.position += 1
-                self.next = Token("STR", string)
+                self.next = Token("STRING", string)
 
             elif letter.isdecimal():
                 num = letter
@@ -92,7 +72,7 @@ class Tokenizer:
                 ):
                     num += self.source[self.position]
                     self.position += 1
-                self.next = Token("INT", num)
+                self.next = Token("NUMBER", num)
 
             elif letter.isalpha() or letter == "_":
                 idtf = letter
@@ -102,13 +82,12 @@ class Tokenizer:
                 ):
                     idtf += self.source[self.position]
                     self.position += 1
-                self.next = Token("IDENTIFIER", idtf)
 
-            elif letter == "\n":
-                self.next = Token("LN", "\n")
+                if idtf in RES_WRDS:
+                    self.next = Token(RES_WRDS[idtf], idtf)
+                else:
+                    self.next = Token("IDENTIFIER", idtf)
 
             else:
                 raise SyntaxError(f"invalid syntax - {self.source[self.position]}")
             return
-
-        self.next = Token("EOF", "")

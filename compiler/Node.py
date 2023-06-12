@@ -1,7 +1,7 @@
 from abc import ABC, abstractmethod
 from typing import List
-from compiler.SymbolTable import SymbolTable
-from compiler.FuncTable import FuncTable
+from .SymbolTable import SymbolTable
+from .FuncTable import FuncTable
 
 
 class Node(ABC):
@@ -123,14 +123,6 @@ class Block(Node):
             if type(child) == Return:
                 return child.evaluate(symbol_table)
             child.evaluate(symbol_table)
-
-
-class ReadLn(Node):
-    def __init__(self) -> None:
-        super().__init__(0, [])
-
-    def evaluate(self, symbol_table: SymbolTable) -> int:
-        return (int, int(input()))
 
 
 class While(Node):
