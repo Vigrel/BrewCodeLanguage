@@ -6,7 +6,7 @@ class CoffeeLexer:
         self.lg = LexerGenerator()
 
     def _add_tokens(self):
-        self.lg.add("SOF", r"Let's brew a coffee")
+        self.lg.add("SOF", r"Lets brew a coffee")
         self.lg.add("EOF", r"Your coffee is ready")
         self.lg.add("FUNC_DEC", r"brew")
         self.lg.add("INT", r"cup")

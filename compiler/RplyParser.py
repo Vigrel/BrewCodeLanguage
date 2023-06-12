@@ -1,9 +1,9 @@
 from rply import ParserGenerator
-from compiler.Node import *
-from compiler.SymbolTable import SymbolTable
+from .Node import *
+from .SymbolTable import SymbolTable
 
 
-class CoffeeParser:
+class RplyParser:
     def __init__(self):
         self.st = SymbolTable()
         self.pg = ParserGenerator(
